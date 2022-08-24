@@ -42,4 +42,39 @@ class HomeController extends Controller
         product::whereIn('id',explode(",",$ids))->delete();
         return response()->json(['success'=>"Products Deleted successfully."]);
     }
+
+    public function store(Request $request)
+    {
+        
+        $input = $request->only('name', 'price', 'status');
+
+        $filename = time().'.'.request()->image->getClientOriginalExtension();
+        request()->image->move(public_path('images'), $filename);
+        $input['image'] = $filename;
+        $input['ups'] = uniqid();
+        product::create($input);
+        return true;
+    }
+
+    public function edit($id)
+    {
+        $product = product::where('id',$id)->first();
+        return $product;
+    }
+
+    public function update(Request $request)
+    {
+        $input = $request->only('name', 'price', 'status');
+
+        if($request->has('image'))
+        {
+            $filename = time().'.'.request()->image->getClientOriginalExtension();
+            request()->image->move(public_path('images'), $filename);
+            $input['image'] = $filename;
+        }
+        
+        
+        product::where('id',$request->id)->update($input);
+        return true;
+    }
 }
