@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\product;
 
 class HomeController extends Controller
 {
@@ -23,6 +24,22 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        $products = product::get();
+        
+        
+        return view('home',compact('products'));
+    }
+
+    public function deletesingle($id)
+    {
+        product::destroy($id);
+    	return response()->json(['success'=>"Product Deleted successfully.", 'tr'=>'tr_'.$id]);
+    }
+
+    public function deleteall(Request $request)
+    {
+        $ids = $request->ids;
+        product::whereIn('id',explode(",",$ids))->delete();
+        return response()->json(['success'=>"Products Deleted successfully."]);
     }
 }
